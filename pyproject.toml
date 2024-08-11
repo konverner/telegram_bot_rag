@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]  # project’s basic metadata, such as the dependencies, your name, etc.
-name = "telegram_bot"
+name = "telegram_bot_rag"
 version = "0.0.0"  #
 description = "Telegram bot with RAG"
 readme = "README.md"

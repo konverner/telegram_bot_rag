@@ -5,7 +5,7 @@ from PyPDF2 import PdfReader
 import docx
 from fastapi import UploadFile
 
-from telegram_bot.service.exceptions import TextFileDecodingException, UnexpectedFileReadingException, \
+from telegram_bot_rag.service.exceptions import TextFileDecodingException, UnexpectedFileReadingException, \
     WordFileReadingException, FileTooLargeException, PDFFileReadingException, UnsupportedFileTypeException
 
 

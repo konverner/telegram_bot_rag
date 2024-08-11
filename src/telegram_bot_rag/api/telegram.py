@@ -7,11 +7,11 @@ from dotenv import load_dotenv, find_dotenv
 from fastapi import UploadFile
 from omegaconf import OmegaConf
 
-from telegram_bot.service.exceptions import UnsupportedFileTypeException
-from telegram_bot.service.file_parser import FileParser
-from telegram_bot.service.llm import FireworksLLM
-from telegram_bot.service.vector_store import VectorStore
-from telegram_bot.db.database import log_message, add_user, add_document
+from telegram_bot_rag.service.exceptions import UnsupportedFileTypeException
+from telegram_bot_rag.service.file_parser import FileParser
+from telegram_bot_rag.service.llm import FireworksLLM
+from telegram_bot_rag.service.vector_store import VectorStore
+from telegram_bot_rag.db.database import log_message, add_user, add_document
 
 
 load_dotenv(find_dotenv(usecwd=True))  # Load environment variables from .env file

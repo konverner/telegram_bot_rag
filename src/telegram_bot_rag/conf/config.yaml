@@ -1,4 +1,2 @@
-telegram_bot:
-  token : "YOUR_BOT_TOKEN"
-application:
-  parameter: "value"
+retriever:
+  model_name: "rubert-base-cased-sentence"

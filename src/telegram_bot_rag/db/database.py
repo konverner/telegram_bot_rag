@@ -10,7 +10,9 @@ from sqlalchemy.orm import sessionmaker
 from .models import Base, Message, User, Document
 
 # Load logging configuration with OmegaConf
-logging_config = OmegaConf.to_container(OmegaConf.load("./src/telegram_bot/conf/logging_config.yaml"), resolve=True)
+logging_config = OmegaConf.to_container(
+	OmegaConf.load("./src/telegram_bot_rag/conf/logging_config.yaml"), resolve=True
+)
 
 # Apply the logging configuration
 logging.config.dictConfig(logging_config)

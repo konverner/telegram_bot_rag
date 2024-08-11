@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 class Message(Base):
-    __tablename__ = 'messages'
+    __tablename__ = 'messages_rag'
 
     id = Column(Integer, primary_key=True)
     timestamp = Column(DateTime)
@@ -13,7 +13,7 @@ class Message(Base):
 
 
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = 'users_rag'
 
     user_id = Column(Integer, primary_key=True)
     first_message_timestamp = Column(DateTime)
@@ -24,7 +24,7 @@ class User(Base):
 
 
 class Document(Base):
-    __tablename__ = 'documents'
+    __tablename__ = 'documents_rag'
 
     id = Column(Integer, primary_key=True)
     document_text = Column(String)

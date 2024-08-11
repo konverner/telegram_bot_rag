@@ -1,0 +1,4 @@
+telegram_bot:
+  token : "YOUR_BOT_TOKEN"
+application:
+  parameter: "value"

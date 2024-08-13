@@ -38,7 +38,7 @@ class FireworksLLM:
                     "content": self.prompt(query, document_name[0], document_text[0])
                 }
             ],
-            max_tokens=200,
+            max_tokens=400,
             temperature=0.6,
             presence_penalty=0,
             frequency_penalty=0,

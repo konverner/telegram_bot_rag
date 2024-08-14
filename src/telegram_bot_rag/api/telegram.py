@@ -16,13 +16,11 @@ from telegram_bot_rag.db.database import log_message, add_user, add_document
 
 load_dotenv(find_dotenv(usecwd=True))  # Load environment variables from .env file
 
-# Load logging configuration with OmegaConf
-logging_config = OmegaConf.to_container(
-    OmegaConf.load("./src/telegram_bot_rag/conf/logging_config.yaml"), resolve=True
-)
+# # Load logging configuration with OmegaConf
+# logging_config = OmegaConf.to_container(OmegaConf.load("./src/telegram_bot_rag/conf/logging_config.yaml"), resolve=True)
 
-# Apply the logging configuration
-logging.config.dictConfig(logging_config)
+# # Apply the logging configuration
+# logging.config.dictConfig(logging_config)
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -38,11 +36,11 @@ idx = 1
 cfg = OmegaConf.load("./src/telegram_bot_rag/conf/config.yaml")
 bot = telebot.TeleBot(TOKEN, parse_mode=None)
 llm = FireworksLLM()
-vector_store = VectorStore(cfg.retriever.model_name)
+vector_store = VectorStore()
 
-@bot.message_handler(commands=['start', 'help'])
+@bot.message_handler(commands=['start'])
 def start(message):
-    bot.send_message(message.chat.id, "Загрузите документы в формaте txt, docx, pdf и задавайте вопросы. Для получения списка ваших документов используйте команду /list_documents.")
+    bot.send_message(message.chat.id, "Загрузите документы в формaте txt, docx, pdf и задавайте вопросы")
 
 
 @bot.message_handler(content_types=['document'])
@@ -80,7 +78,7 @@ def load_document(message):
         bot.send_message(message.chat.id, "Пожалуйста, загрузите текстовый файл (txt, doc, docx, pdf).")
 
 
-@bot.message_handler(commands=['/list_documents'])
+@bot.message_handler(commands=['get_docs'])
 def get_docs(message):
     logger.info(f"[get_docs] Received message: '{message.text}' from chat {message.from_user.username} ({message.chat.id})")
     documents = vector_store.get_collection_content(message.from_user.username)

@@ -3,7 +3,7 @@ from chromadb import EmbeddingFunction
 from sentence_transformers import SentenceTransformer
 
 class SentenceTransformerEmbeddingFunction(EmbeddingFunction):
-    def __init__(self, model_name: str):
+    def __init__(self, model_name="DeepPavlov/rubert-base-cased-sentence"):
       self.model = SentenceTransformer(model_name)
     def __call__(self, input_document):
         batch_embeddings = self.model.encode(input_document)
@@ -26,9 +26,9 @@ class VectorStore:
         )
 
     def query(self, question: str, n_results: int, collection_name: str):
-        collection = self.client.get_or_create_collection(collection_name, embedding_function=self.embedding_func)
+        collection = self.client.get_collection(collection_name, embedding_function=self.embedding_func)
         return collection.query(query_texts=question, n_results=n_results)
 
     def get_collection_content(self, collection_name: str):
-        collection = self.client.get_or_create_collection(collection_name)
+        collection = self.client.get_collection(collection_name)
         return collection.get()["ids"]

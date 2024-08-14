@@ -8,7 +8,6 @@ WORKDIR /app
 # Copy the pyproject.toml and other necessary files
 COPY pyproject.toml .
 COPY src ./src
-COPY tests ./tests
 
 # Copy the .env file into the container
 COPY .env /app/

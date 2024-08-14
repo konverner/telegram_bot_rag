@@ -1,5 +1,5 @@
 retriever:
-  model_name: "./models/rubert-base-cased-sentence"
+  model_name: "DeepPavlov/rubert-base-cased-sentence"
 llm:
   model_name: "accounts/fireworks/models/llama-v3-70b-instruct"
   prompt_template: "Твоя задача ответить на ВОПРОС опираясь на ДОКУМЕНТ. Отвечай на языке, на котором был задан вопрос.

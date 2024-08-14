@@ -8,7 +8,6 @@ WORKDIR /app
 # Copy the pyproject.toml and other necessary files
 COPY pyproject.toml .
 COPY src ./src
-COPY tests ./tests
 
 # Copy the .env file into the container
 COPY .env /app/
@@ -26,4 +25,4 @@ COPY . /app
 EXPOSE 80
 
 # Run the application when the container launches
-CMD ["python", "src/telegram_bot/main.py"]
+CMD ["python", "src/telegram_bot_rag/main.py"]

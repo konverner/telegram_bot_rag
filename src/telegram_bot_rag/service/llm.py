@@ -1,8 +1,8 @@
 """ Application that provides functionality for the Telegram bot. """
-import os
 import logging.config
+import os
 
-from dotenv import load_dotenv, find_dotenv
+from dotenv import find_dotenv, load_dotenv
 from omegaconf import OmegaConf
 
 load_dotenv(find_dotenv(usecwd=True))  # Load environment variables from .env file
@@ -17,20 +17,29 @@ logging.config.dictConfig(logging_config)
 logger = logging.getLogger(__name__)
 
 class FireworksLLM:
-    def __init__(self):
+    def __init__(self, model_name: str, prompt_template: str):
         import fireworks.client
         API_KEY = os.getenv("API_KEY")
+        if API_KEY is None:
+            logger.error("API_KEY is not set in the environment variables.")
+            raise ValueError("API_KEY is not set in the environment variables.")
         self.client = fireworks.client
+        self.model_name = model_name
         fireworks.client.api_key = API_KEY
-        self.prompt = lambda query, document_name, document_text: f"Твоя задача ответить на ВОПРОС опираясь на ДОКУМЕНТ. Процитируй название документа. ВОПРОС: {query} Название ДОКУМЕНТА: {document_name} Содержание ДОКУМЕНТа: {document_text}"
+        self.prompt_template = prompt_template
 
-    def run(self, query: str, document_text: str, document_name: str):
+    def run(self, query: str, document_text: list[str], document_name: list[str]):
+        """Run the LLM model with the given query and document."""
         completion = self.client.ChatCompletion.create(
-            model="accounts/fireworks/models/llama-v3-70b-instruct",
+            model=self.model_name,
             messages=[
                 {
                     "role": "user",
-                    "content": self.prompt(query, document_name[0], document_text[0])
+                    "content": self.prompt_template.format(
+                        query=query,
+                        document_name=document_name[0],
+                        document_text=document_text[0]
+                    )
                 }
             ],
             max_tokens=200,

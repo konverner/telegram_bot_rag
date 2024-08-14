@@ -1,26 +1,25 @@
+import logging.config
 import os
 from io import BytesIO
 
 import telebot
-import logging.config
-from dotenv import load_dotenv, find_dotenv
+from dotenv import find_dotenv, load_dotenv
 from fastapi import UploadFile
 from omegaconf import OmegaConf
 
+from telegram_bot_rag.db.database import add_user, log_message
 from telegram_bot_rag.service.exceptions import UnsupportedFileTypeException
 from telegram_bot_rag.service.file_parser import FileParser
 from telegram_bot_rag.service.llm import FireworksLLM
 from telegram_bot_rag.service.vector_store import VectorStore
-from telegram_bot_rag.db.database import log_message, add_user, add_document
-
 
 load_dotenv(find_dotenv(usecwd=True))  # Load environment variables from .env file
 
-# # Load logging configuration with OmegaConf
-# logging_config = OmegaConf.to_container(OmegaConf.load("./src/telegram_bot_rag/conf/logging_config.yaml"), resolve=True)
+# Load logging configuration with OmegaConf
+logging_config = OmegaConf.to_container(OmegaConf.load("./src/telegram_bot_rag/conf/logging_config.yaml"), resolve=True)
 
-# # Apply the logging configuration
-# logging.config.dictConfig(logging_config)
+# Apply the logging configuration
+logging.config.dictConfig(logging_config)
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -32,20 +31,19 @@ if TOKEN is None:
     logger.error("BOT_TOKEN is not set in the environment variables.")
     exit(1)
 
-idx = 1
 cfg = OmegaConf.load("./src/telegram_bot_rag/conf/config.yaml")
 bot = telebot.TeleBot(TOKEN, parse_mode=None)
-llm = FireworksLLM()
-vector_store = VectorStore()
 
-@bot.message_handler(commands=['start'])
+llm = FireworksLLM(model_name=cfg.llm.model_name, prompt_template=cfg.llm.prompt_template)
+vector_store = VectorStore(embedding_model_name=cfg.retriever.model_name)
+
+@bot.message_handler(commands=['start', 'help'])
 def start(message):
-    bot.send_message(message.chat.id, "Загрузите документы в формaте txt, docx, pdf и задавайте вопросы")
+    bot.send_message(message.chat.id, "Загрузите документы в формaте txt, docx, pdf и задавайте вопросы.")
 
 
 @bot.message_handler(content_types=['document'])
 def load_document(message):
-    global idx
     document = message.document
     logger.info(
         f"[load_document] Received document: {document.file_name} with type"
@@ -70,11 +68,10 @@ def load_document(message):
             collection_name=message.from_user.username
         )
 
-        logger.info(f"Document {document.file_name} has been upserted to ChromaDB with idx {idx}")
-        idx += 1
+        logger.info(f"Document {document.file_name} has been upserted to ChromaDB")
         bot.send_message(message.chat.id, "Документ загружен.")
     except UnsupportedFileTypeException:
-        logger.error(f"Document {document.file_name} has NOT been upserted to ChromaDB with idx {idx}")
+        logger.error(f"Document {document.file_name} has NOT been upserted to ChromaDB")
         bot.send_message(message.chat.id, "Пожалуйста, загрузите текстовый файл (txt, doc, docx, pdf).")
 
 
@@ -82,9 +79,13 @@ def load_document(message):
 def get_docs(message):
     logger.info(f"[get_docs] Received message: '{message.text}' from chat {message.from_user.username} ({message.chat.id})")
     documents = vector_store.get_collection_content(message.from_user.username)
-    documents_str = '\n'.join(documents)
-    response = f"Список ваших документов {documents_str}"
-    bot.send_message(message.chat.id, response)
+    if not documents:
+        response = "У вас нет загруженных документов."
+        bot.send_message(message.chat.id, response)
+    else:
+        documents_str = '\n'.join(documents)
+        response = f"Список ваших документов:\n {documents_str}"
+        bot.send_message(message.chat.id, response)
 
 
 @bot.message_handler(func=lambda message: True, content_types=['text'])

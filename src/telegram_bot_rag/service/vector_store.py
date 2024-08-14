@@ -2,18 +2,19 @@ import chromadb
 from chromadb import EmbeddingFunction
 from sentence_transformers import SentenceTransformer
 
+
 class SentenceTransformerEmbeddingFunction(EmbeddingFunction):
-    def __init__(self, model_name="DeepPavlov/rubert-base-cased-sentence"):
-      self.model = SentenceTransformer(model_name)
+    def __init__(self, model_name: str):
+        self.model = SentenceTransformer(model_name)
     def __call__(self, input_document):
         batch_embeddings = self.model.encode(input_document)
         return batch_embeddings.tolist()
 
 
 class VectorStore:
-    def __init__(self):
+    def __init__(self, embedding_model_name: str):
         self.client = chromadb.Client()
-        self.embedding_func = SentenceTransformerEmbeddingFunction()
+        self.embedding_func = SentenceTransformerEmbeddingFunction(embedding_model_name)
     def upsert_document(self, document_text: str, document_name: str, collection_name: str):
         collection = self.client.get_or_create_collection(
             name=collection_name, embedding_function=self.embedding_func
@@ -26,9 +27,9 @@ class VectorStore:
         )
 
     def query(self, question: str, n_results: int, collection_name: str):
-        collection = self.client.get_collection(collection_name, embedding_function=self.embedding_func)
+        collection = self.client.get_or_create_collection(collection_name, embedding_function=self.embedding_func)
         return collection.query(query_texts=question, n_results=n_results)
 
     def get_collection_content(self, collection_name: str):
-        collection = self.client.get_collection(collection_name)
+        collection = self.client.get_or_create_collection(collection_name)
         return collection.get()["ids"]

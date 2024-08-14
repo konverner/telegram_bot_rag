@@ -16,11 +16,11 @@ from telegram_bot_rag.db.database import log_message, add_user, add_document
 
 load_dotenv(find_dotenv(usecwd=True))  # Load environment variables from .env file
 
-# Load logging configuration with OmegaConf
-logging_config = OmegaConf.to_container(OmegaConf.load("./src/telegram_bot/conf/logging_config.yaml"), resolve=True)
+# # Load logging configuration with OmegaConf
+# logging_config = OmegaConf.to_container(OmegaConf.load("./src/telegram_bot_rag/conf/logging_config.yaml"), resolve=True)
 
-# Apply the logging configuration
-logging.config.dictConfig(logging_config)
+# # Apply the logging configuration
+# logging.config.dictConfig(logging_config)
 
 # Configure logging
 logger = logging.getLogger(__name__)

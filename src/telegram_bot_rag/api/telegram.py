@@ -33,7 +33,7 @@ if TOKEN is None:
     exit(1)
 
 idx = 1
-cfg = OmegaConf.load("./src/telegram_bot/conf/config.yaml")
+cfg = OmegaConf.load("./src/telegram_bot_rag/conf/config.yaml")
 bot = telebot.TeleBot(TOKEN, parse_mode=None)
 llm = FireworksLLM()
 vector_store = VectorStore()

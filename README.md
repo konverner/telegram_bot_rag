@@ -22,6 +22,26 @@ The project is structured as follows:
 
 `Dockerfile` - The file that defines the Docker container for this application.
 
+## Functional
+
+``` mermaid
+
+sequenceDiagram
+    actor User as User
+    User ->> Telegram: sends a file
+    Telegram ->> FileParser: sends a file
+    FileParser ->> RAG: sends a document
+    RAG ->> RAG: saves the document
+    User ->> Telegram: sends a question
+    Telegram ->> RAG: sends a question
+    RAG ->> RAG: retrieves documents
+    RAG ->> RAG: creates a prompt
+    RAG ->> RAG: envoke a LLM
+    RAG ->> Telegram: sends a response
+    Telegram ->> User: sends a response
+
+```
+
 ## Setup
 
 1. Clone this repository.

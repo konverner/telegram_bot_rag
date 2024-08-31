@@ -15,13 +15,8 @@ from telegram_bot_rag.service.vector_store import VectorStore
 
 load_dotenv(find_dotenv(usecwd=True))  # Load environment variables from .env file
 
-# Load logging configuration with OmegaConf
 logging_config = OmegaConf.to_container(OmegaConf.load("./src/telegram_bot_rag/conf/logging_config.yaml"), resolve=True)
-
-# Apply the logging configuration
 logging.config.dictConfig(logging_config)
-
-# Configure logging
 logger = logging.getLogger(__name__)
 
 load_dotenv(find_dotenv(usecwd=True))  # Load environment variables from .env file
@@ -111,4 +106,4 @@ def ask_question(message):
 
 def start_bot():
     logger.info(f"bot `{str(bot.get_me().username)}` has started")
-    bot.polling()
+    bot.infinity_polling()

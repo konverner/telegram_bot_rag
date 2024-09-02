@@ -5,6 +5,7 @@ from io import BytesIO
 import telebot
 from dotenv import find_dotenv, load_dotenv
 from fastapi import UploadFile
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from omegaconf import OmegaConf
 
 from telegram_bot_rag.db.database import add_user, log_message
@@ -31,6 +32,7 @@ bot = telebot.TeleBot(TOKEN, parse_mode=None)
 
 llm = FireworksLLM(model_name=cfg.llm.model_name, prompt_template=cfg.llm.prompt_template)
 vector_store = VectorStore(embedding_model_name=cfg.retriever.model_name)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=10)
 
 @bot.message_handler(commands=['start', 'help'])
 def start(message):
@@ -57,9 +59,10 @@ def load_document(message):
             headers={"content-type": document.mime_type}
         )
         document_text = file_parser.extract_content(upload_file)
-        vector_store.upsert_document(
-            document_text=document_text,
-            document_name=document.file_name,
+        document_chunks = text_splitter.split_text(document_text)
+        vector_store.upsert_documents(
+            documents_text=document_chunks,
+            documents_name=[document.file_name]*len(document_chunks),
             collection_name=message.from_user.username
         )
 
@@ -73,7 +76,7 @@ def load_document(message):
 @bot.message_handler(commands=['get_docs'])
 def get_docs(message):
     logger.info(f"[get_docs] Received message: '{message.text}' from chat {message.from_user.username} ({message.chat.id})")
-    documents = vector_store.get_collection_content(message.from_user.username)
+    documents = vector_store.get_document_names(message.from_user.username)
     if not documents:
         response = "У вас нет загруженных документов."
         bot.send_message(message.chat.id, response)
@@ -92,7 +95,7 @@ def ask_question(message):
     )
     retriever_results = vector_store.query(question, 1, message.from_user.username)
     document_text = retriever_results["documents"][0]
-    document_name = retriever_results["ids"][0]
+    document_name = retriever_results["metadatas"][0]
     response = llm.run(question, document_text, document_name)
     bot.send_message(message.chat.id, response)
 
@@ -106,4 +109,4 @@ def ask_question(message):
 
 def start_bot():
     logger.info(f"bot `{str(bot.get_me().username)}` has started")
-    bot.infinity_polling()
+    bot.polling()

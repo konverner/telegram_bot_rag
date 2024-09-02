@@ -22,6 +22,7 @@ classifiers = [  #
 dependencies = [
     "pyTelegramBotAPI==4.20.0",
     "omegaconf==2.3.0",
+    "transformers[torch]",
     "sqlalchemy==1.4.25",
     "psycopg2-binary",
     "python-dotenv",
